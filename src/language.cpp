@@ -31,6 +31,7 @@
 #include <unordered_map>
 
 #include "resource_manager.hpp"
+#include "utf8.hpp"
 
 using json = nlohmann::json;
 using validator = nlohmann::json_schema::json_validator;
@@ -44,7 +45,7 @@ void from_json(const json& j, LanguageObject& l) {
         std::unordered_map<std::string, std::string> translations;
 
         for (auto& [lang_tag, text] : value.items()) {
-            translations[lang_tag] = text.get<std::string>();
+            translations[lang_tag] = utf8_decode(text.get<std::string>());
         }
 
         if (translations.find("en-US") == translations.end()) {

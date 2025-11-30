@@ -193,3 +193,22 @@ size_t utf8_next_char_offset(const char* str, size_t byte_offset) {
 
     return byte_offset + 1; /* Fallback: move one byte */
 }
+
+std::string utf8_decode(const std::string& input) {
+    std::string result;
+    try {
+        const auto codepoints = utf8_to_codepoints(input);
+
+        for (const auto codepoint : codepoints) {
+            if (codepoint < 256) {
+                result += static_cast<char>(codepoint);
+            } else {
+                result += '?';
+            }
+        }
+    } catch (const std::exception& e) {
+        SDL_Log("UTF-8 decode error: %s", e.what());
+        return input; /* Fallback to original string on error */
+    }
+    return result;
+}
