@@ -44,6 +44,22 @@
 #include "units_manager.hpp"
 #include "window_manager.hpp"
 
+
+/// START: Temporary code to identify resource types
+const char* GetResourceTypeString(ResourceID id) {
+    if (id >= V_START && id < V_END) return "Voice";
+    if (id >= FXS_STRT && id < FXS_END) return "Sound Effect";
+    if (id >= SNOW_MSC && id <= LOSE_MSC) return "Music";
+    if (id >= LOGOFLIC && id <= DEMO5FLC) return "Animation (Flic)";
+    if (id >= FONT_S && id < FONT_E) return "Font";
+    if (id >= SCRIPT_S && id < SCRIPT_E) return "Script";
+    if (id >= WORLD_S && id < WORLD_E) return "World Texture";
+    // Default to image if not otherwise specified
+    if (id < MEM_END) return "Image (UI/Unit)";
+    return "Data/Other";
+}
+/// END: Temporary code
+
 #define INIFILE_BUFFER_SIZE 2048
 
 struct res_index {
@@ -767,6 +783,23 @@ int32_t ResourceManager_InitResManager() {
                 }
             }
         }
+    
+
+/// START: Temporary code to list RES contents
+printf("\n--- Listing All Loaded Resources ---\n");
+for (int32_t i = 0; i < RESOURCE_E; ++i) {
+    if (ResourceManager_ResMetaTable[i].res_file_item_index != INVALID_ID) {
+        const char* resource_name = ResourceManager_GetResourceID(static_cast<ResourceID>(i));
+        if (resource_name) {
+            // Get the type as a string
+            const char* type_string = GetResourceTypeString(static_cast<ResourceID>(i));
+            printf("Found: %-20s Type: %s\n", resource_name, type_string);
+        }
+    }
+}
+printf("--- End of Resource List ---\n\n");
+/// END: Temporary code
+
     } else {
         result = EXIT_CODE_INSUFFICIENT_MEMORY;
     }
