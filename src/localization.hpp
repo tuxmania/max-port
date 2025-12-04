@@ -37,6 +37,8 @@ public:
     Localization();
     ~Localization();
 
+    static void SetIsLocalized(const char* str, bool localized); // <-- AJOUTER CE PROTOTYPE
+    static bool IsLocalized(const char* str);                   // <-- AJOUTER CE PROTOTYPE
     static const char* GetText(const char* key);
 };
 

@@ -25,6 +25,8 @@
 #include FT_FREETYPE_H
 
 #include <map>
+#include <vector>
+#include <string>
 
 #include "localization.hpp"
 #include "point.hpp"
@@ -408,6 +410,57 @@ struct FontGlyph& Text_GetGlyph(Uint32 key) {
     return Text_CurrentFont->glyphs[key];
 }
 
+static std::string Text_Cp850ToUtf8(const char* str) {
+    // Table de mappage des 128 codes CP850 étendus (0x80 à 0xFF) vers Unicode.
+    // Utilisée pour convertir les accents et caractères spéciaux DOS.
+    static const uint16_t cp850_to_unicode[128] = {
+        0x00C7, 0x00FC, 0x00E9, 0x00E2, 0x00E4, 0x00E0, 0x00E5, 0x00E7, // 80-87
+        0x00EA, 0x00EB, 0x00E8, 0x00EF, 0x00EE, 0x00EC, 0x00C4, 0x00C5, // 88-8F
+        0x00C9, 0x00E6, 0x00C6, 0x00F4, 0x00F6, 0x00F2, 0x00FB, 0x00F9, // 90-97
+        0x00FF, 0x00D6, 0x00DC, 0x00F8, 0x00A3, 0x00D8, 0x00D7, 0x0192, // 98-9F
+        0x00E1, 0x00ED, 0x00F3, 0x00FA, 0x00F1, 0x00D1, 0x00AA, 0x00BA, // A0-A7
+        0x00BF, 0x00AE, 0x00AC, 0x00BD, 0x00BC, 0x00A1, 0x00AB, 0x00BB, // A8-AF
+        0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x00C1, 0x00C2, 0x00C0, // B0-B7
+        0x00A9, 0x2563, 0x2551, 0x2557, 0x255D, 0x00A2, 0x00A5, 0x2510, // B8-BF
+        0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x00E3, 0x00C3, // C0-C7
+        0x255A, 0x2554, 0x2569, 0x2566, 0x2560, 0x2550, 0x256C, 0x00A4, // C8-CF
+        0x00F0, 0x00D0, 0x00CA, 0x00CB, 0x00C8, 0x0131, 0x00CD, 0x00CE, // D0-D7
+        0x00CF, 0x2518, 0x250C, 0x2588, 0x2584, 0x00A6, 0x00CC, 0x2580, // D8-DF
+        0x00D3, 0x00DF, 0x00D4, 0x00D2, 0x00F5, 0x00D5, 0x00B5, 0x00FE, // E0-E7
+        0x00DE, 0x00DA, 0x00DB, 0x00D9, 0x00FD, 0x00DD, 0x00AF, 0x00B4, // E8-EF
+        0x00AD, 0x00B1, 0x2017, 0x00BE, 0x00B6, 0x00A7, 0x00F7, 0x00B8, // F0-F7
+        0x00B0, 0x00A8, 0x00B7, 0x00B9, 0x00B3, 0x00B2, 0x25A0, 0x00A0  // F8-FF
+    };
+
+    std::string result;
+    result.reserve(strlen(str) * 2);
+
+    const unsigned char* p = reinterpret_cast<const unsigned char*>(str);
+    while (*p) {
+        if (*p < 128) {
+            // Caractères ASCII standard, copiés tels quels
+            result += static_cast<char>(*p);
+        } else {
+            // Caractères étendus CP850 (>= 128). Convertir en UTF-8.
+            uint16_t unicode = cp850_to_unicode[*p - 128];
+            
+            // Logique d'encodage UTF-8:
+            if (unicode < 0x800) {
+                // 2 octets
+                result += static_cast<char>(0xC0 | (unicode >> 6));
+                result += static_cast<char>(0x80 | (unicode & 0x3F));
+            } else {
+                // 3 octets (rare pour CP850, mais sécuritaire)
+                result += static_cast<char>(0xE0 | (unicode >> 12));
+                result += static_cast<char>(0x80 | ((unicode >> 6) & 0x3F));
+                result += static_cast<char>(0x80 | (unicode & 0x3F));
+            }
+        }
+        p++;
+    }
+    return result;
+}
+
 uint32_t Text_GetHash(const char* str) {
     uint32_t hash = 0;
 
@@ -451,28 +504,44 @@ void Text_AddCachedString(Uint32* buffer, uint32_t& hash) {
 }
 
 Uint32* Text_Utf8ToUcs4(const char* str) {
+    std::string utf8_string;
+    const char* processed_str;
+
+    // Si la chaîne est marquée comme localisée (par GetText), elle est déjà UTF-8.
+    if (Localization::IsLocalized(str)) {
+        processed_str = str; // Utilise l'UTF-8 d'origine
+    } else {
+        // La chaîne vient d'un fichier de données (e.g. TRA, CAM) qui est en CP850. On convertit.
+        utf8_string = Text_Cp850ToUtf8(str);
+        processed_str = utf8_string.c_str(); 
+    }
+
     uint32_t hash;
-    Uint32* result = Text_GetCachedString(str, hash);
+    // Utiliser la chaîne convertie pour le cache
+    Uint32* result = Text_GetCachedString(processed_str, hash);
 
     if (result) {
         return result;
     }
 
     if (Text_CurrentFont->cd != reinterpret_cast<SDL_iconv_t>(-1)) {
-        size_t src_len = strlen(str) + 1;
-        size_t dst_len = src_len;
+        // Le SDL_iconv a été configuré pour convertir de UTF-8 (source) à UCS-4 (destination)
+        size_t src_len = strlen(processed_str) + 1; // Longueur de la chaîne UTF-8 convertie
+        size_t dst_len = src_len * 4; // Taille de destination sécuritaire pour UCS4
         Uint32* buffer = new (std::nothrow) Uint32[dst_len];
 
         if (buffer) {
-            const char* src_str = const_cast<char*>(str);
+            const char* src_str = const_cast<char*>(processed_str);
             char* dst_str = reinterpret_cast<char*>(buffer);
+            size_t out_bytes_left = dst_len * sizeof(Uint32); 
 
-            buffer[dst_len - 1] = 0;
-            dst_len *= sizeof(Uint32);
-
+            // Reset state
             SDL_iconv(Text_CurrentFont->cd, nullptr, nullptr, nullptr, nullptr);
 
-            if (SDL_iconv(Text_CurrentFont->cd, &src_str, &src_len, &dst_str, &dst_len) != SDL_ICONV_ERROR) {
+            if (SDL_iconv(Text_CurrentFont->cd, &src_str, &src_len, &dst_str, &out_bytes_left) != SDL_ICONV_ERROR) {
+                // Assurer la terminaison nulle UCS-4
+                buffer[(dst_len * sizeof(Uint32) - out_bytes_left) / sizeof(Uint32)] = 0;
+                
                 Text_AddCachedString(buffer, hash);
                 result = buffer;
 

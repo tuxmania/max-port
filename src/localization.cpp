@@ -29,10 +29,12 @@
 #include "ini.hpp"
 #include "lang_config.hpp"
 #include "resource_manager.hpp"
+#include <set> // <-- AJOUTER
 
 #define LOCALIZATION_BUFFER_SIZE 2048
 
 static std::unique_ptr<Localization> Localization_Locale;
+static std::set<const char*> Localization_LocalizedStrings; // <-- AJOUTER
 
 enum IniKeyValueType_e {
     INI_SECTION = 0x1,
@@ -45,6 +47,18 @@ struct IniKey {
 };
 
 static const IniKey Localization_IniKeysTable[] = {LOCALIZATION_INI_MAP};
+
+void Localization::SetIsLocalized(const char* str, bool localized) {
+    if (localized) {
+        Localization_LocalizedStrings.insert(str);
+    } else {
+        Localization_LocalizedStrings.erase(str);
+    }
+}
+
+bool Localization::IsLocalized(const char* str) {
+    return Localization_LocalizedStrings.contains(str);
+}
 
 Localization::Localization() {}
 
@@ -147,9 +161,16 @@ const char* Localization::GetText(const char* key) {
     }
 
     if (Localization_Locale->strings.contains(key)) {
-        return Localization_Locale->strings[key].c_str();
+        // La chaîne a été trouvée dans le .ini (elle est en UTF-8)
+        const char* result = Localization_Locale->strings[key].c_str();
+
+        // MARQUAGE : Indiquer au système de rendu que cette chaîne est déjà UTF-8
+        SetIsLocalized(result, true); // <-- AJOUTER LE MARQUAGE
+
+        return result;
 
     } else {
+        // La chaîne n'a pas été trouvée, elle retourne la clé d'origine (non marquée)
         return key;
     }
 }
