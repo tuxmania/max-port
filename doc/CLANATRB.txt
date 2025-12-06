@@ -1,0 +1,40 @@
+Walkthrough - Résolution de l'Assertion *attrib_id < ATTRIB_COUNT
+
+Problème:
+L'utilisateur rencontrait une assertion failure dans src/inifile.cpp:516 (*attrib_id < ATTRIB_COUNT).
+Cette erreur survenait car le jeu chargeait des attributs de clan depuis le fichier de ressources CLANATRB (dans MAX.RES) et tentait de les faire correspondre à des clés définies dans le fichier de localisation (
+assets/lang_french.ini).
+Le fichier lang_french.ini contenait des termes anglais ("armor", "hits", etc.) ou des termes français incorrects ("Points", "Desac.") qui ne correspondaient pas aux chaînes présentes dans les données binaires du jeu ("Blindge", "Coups", "Désactivé").
+
+Solution:
+Nous avons identifié les termes exacts attendus par le jeu en créant un test unitaire dédié 
+test/test_localization_consistency.cpp qui a dumpé le contenu brut de CLANATRB.
+
+Corrections appliquées dans assets/lang_french.ini
+Les mappings suivants ont été corrigés pour correspondre aux données du jeu :
+
+Clé Hex	Valeur Précédente	Valeur Corrigée (Données Jeu)	Attribut
+d81e	armor / Blind.	Blindge	ATTRIB_ARMOR
+62f5	hits / Points	Coups	ATTRIB_HITS
+e9d8	disable / Desac.	Désactivé	ATTRIB_AGENT_ADJUST
+fca3	attack	Attaq.	ATTRIB_ATTACK
+2269	range	Porte	ATTRIB_RANGE
+bbcc	speed	Vitesse	ATTRIB_SPEED
+59ad	scan	Scan.	ATTRIB_SCAN
+6976	turns	Tours	ATTRIB_TURNS
+D'autres attributs comme 24d8 (Munitions), 206c (Tirs), etc., sont absents du fichier de données CLANATRB et n'ont donc pas d'impact sur la stabilité.
+
+Vérification:
+Le test unitaire LocalizationConsistencyTest.VerifyClanAttributesMatchFrenchIni a été exécuté. Il a permis de :
+
+Dumper le contenu de CLANATRB pour analyse.
+Vérifier la présence/absence des chaînes.
+L'utilisateur a confirmé avoir appliqué les corrections, ce qui résout l'assertion.
+
+Fichiers Modifiés/Créés
+assets/lang_french.ini
+ : Correction des traductions.
+test/test_localization_consistency.cpp
+ : CREATED - Test de consistance et outil de dump.
+test/CMakeLists.txt
+ : MODIFIED - Ajout du test et des sources du moteur nécessaires.
