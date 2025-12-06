@@ -25,9 +25,16 @@ set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(GTest)
 
+
+
+# Remove main.cpp from GAME_SOURCES to avoid conflict with test_main.cpp
+list(FILTER GAME_SOURCES EXCLUDE REGEX "main.cpp$")
+set(GAME_SOURCES_NO_MAIN ${GAME_SOURCES})
+
 add_executable(
     max_tests
     test_main.cpp
+    test_localization_consistency.cpp
     smartpointer.cpp
     smartlist.cpp
     smartarray.cpp
@@ -38,6 +45,7 @@ add_executable(
     ../src/smartfile.cpp
     smartobjectarray.cpp
     smartstring.cpp
+    ${GAME_SOURCES_NO_MAIN}
 )
 
 target_compile_options(max_tests PRIVATE --coverage)
