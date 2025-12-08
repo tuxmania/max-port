@@ -18,7 +18,7 @@ max_recompile() {
     cd RelWithDebInfo || return 1
     
     # 3. Configuration CMake
-    cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-x86_64.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=/usr/local ..
+    cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-x86_64.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_CXX_STANDARD=20 ..
     
     # 4. Compilation
     echo "Compilation en cours..."
@@ -26,3 +26,5 @@ max_recompile() {
 
     echo "✅ Compilation terminée avec succès."
 }
+
+max_recompile
