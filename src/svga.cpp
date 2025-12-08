@@ -149,7 +149,12 @@ int32_t Svga_Init(void) {
 
     if ((sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE)) ==
         nullptr) {
-        AiLog log("SDL_CreateRenderer failed: %s\n", SDL_GetError());
+        AiLog log("SDL_CreateRenderer accelerated failed: %s\n", SDL_GetError());
+
+        if ((sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_SOFTWARE | SDL_RENDERER_TARGETTEXTURE)) ==
+            nullptr) {
+            AiLog log("SDL_CreateRenderer software failed: %s\n", SDL_GetError());
+        }
     }
 
     switch (Svga_ScaleQuality) {
