@@ -35,6 +35,7 @@ add_executable(
     max_tests
     test_main.cpp
     test_localization_consistency.cpp
+    test_save_victory.cpp
     smartpointer.cpp
     smartlist.cpp
     smartarray.cpp
