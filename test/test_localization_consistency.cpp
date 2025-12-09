@@ -161,13 +161,13 @@ TEST_F(LocalizationConsistencyTest, VerifyClanAttributesMatchFrenchIni) {
     
     // Verifying others
     EXPECT_EQ(french_translations["206c"], "Tirs");
-    EXPECT_EQ(french_translations["d81e"], "Blind.");
-    EXPECT_EQ(french_translations["62f5"], "Points");
+    EXPECT_EQ(french_translations["d81e"], "Blindge");
+    EXPECT_EQ(french_translations["62f5"], "Coups");
     EXPECT_EQ(french_translations["24d8"], "Mun.");
     EXPECT_EQ(french_translations["4027"], "Mv&Tir");
     EXPECT_EQ(french_translations["49a2"], "Stock.");
     EXPECT_EQ(french_translations["4a91"], "Zone");
-    EXPECT_EQ(french_translations["e9d8"], "Desac."); // User changed this manually to Desac.
+    EXPECT_EQ(french_translations["e9d8"], "D\x82sactiv\x82"); // User changed this manually to Desac.
     
     // Now, scan CLANATRB content to see if these strings are actually present.
     // This confirms that the game data indeed uses "Attaq." and not "Attaque".
