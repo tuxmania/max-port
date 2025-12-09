@@ -344,7 +344,7 @@ bool AiAttack_ProcessAttack(UnitInfo* attacker, UnitInfo* target) {
             } else {
                 int32_t attack_radius = attacker->GetBaseValues()->GetAttribute(ATTRIB_ATTACK_RADIUS);
 
-                if (attack_radius >= 1 && ini_get_setting(INI_OPPONENT) >= OPPONENT_TYPE_AVERAGE &&
+                if (attacker->speed > 0 && attack_radius >= 1 && ini_get_setting(INI_OPPONENT) >= OPPONENT_TYPE_AVERAGE &&
                     attacker->shots > 0) {
                     ZoneWalker walker(Point(target->grid_x, target->grid_y), attack_radius);
                     Point site;
