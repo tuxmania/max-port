@@ -36,6 +36,7 @@ add_executable(
     test_main.cpp
     test_localization_consistency.cpp
     test_save_victory.cpp
+    test_save_rocket.cpp
     smartpointer.cpp
     smartlist.cpp
     smartarray.cpp

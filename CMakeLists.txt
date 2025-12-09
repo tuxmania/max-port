@@ -7,6 +7,13 @@ set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 option(MAX_BUILD_TESTS "Build unit tests by default" ON)
 option(MAX_ENABLE_UPNP "Use miniupnpc library" ON)
 
+# User requested configuration
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# Default to shared libs if not specified, though command line overrides this cache variable usually if already set
+set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries" FORCE)
+
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 

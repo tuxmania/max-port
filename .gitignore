@@ -57,3 +57,6 @@ Release/**
 RelWithDebInfo/**
 build/**
 MinSizeRel/**
+
+# Fichiers de configuration de l'éditeur VS Code
+.vscode/
