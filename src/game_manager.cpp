@@ -4228,7 +4228,7 @@ void GameManager_SaveLoadGame(bool save_load_mode) {
         sprintf(file_name, "save%i.%s", SaveLoadMenu_SaveSlot, SaveLoadMenu_SaveFileTypes[save_type]);
         ResourceManager_ToUpperCase(file_name);
 
-        if (SaveLoad_GetSaveFileInfo(SaveLoadMenu_SaveSlot, save_type, save_file_header, false)) {
+        if (SaveLoadMenu_GetSavedGameInfo(SaveLoadMenu_SaveSlot, save_type, save_file_header, false)) {
             string.Sprintf(200, save_load_mode ? _(e285) : _(470e), file_name, save_file_header.save_name);
 
             if (OKCancelMenu_Menu(string.GetCStr())) {
