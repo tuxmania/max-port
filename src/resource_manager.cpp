@@ -683,8 +683,11 @@ void ResourceManager_TestDiskSpace() {
     }
 }
 
+#include "kb.h"
+
 void ResourceManager_InitInternals() {
     int32_t error_code;
+    char language[64];
 
     error_code = ResourceManager_InitResManager();
 
@@ -697,6 +700,20 @@ void ResourceManager_InitInternals() {
 
     if (WindowManager_Init()) {
         ResourceManager_ExitGame(EXIT_CODE_SCREEN_INIT_FAILED);
+    }
+
+    if (ini_config.GetStringValue(INI_LANGUAGE, language, sizeof(language))) {
+        if (!SDL_strcasecmp(language, "french")) {
+            kb_set_layout(french);
+        } else if (!SDL_strcasecmp(language, "german")) {
+            kb_set_layout(german);
+        } else if (!SDL_strcasecmp(language, "italian")) {
+            kb_set_layout(italian);
+        } else if (!SDL_strcasecmp(language, "spanish")) {
+            kb_set_layout(spanish);
+        } else {
+            kb_set_layout(english);
+        }
     }
 
     SDL_SetAssertionHandler(&ResourceManager_AssertionHandler, nullptr);

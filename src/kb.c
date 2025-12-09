@@ -342,7 +342,58 @@ int32_t kb_next_ascii_English_US(void) {
     return result;
 }
 
-int32_t kb_next_ascii_French(void) { return -1; }
+int32_t kb_next_ascii_French(void) {
+    int32_t result;
+    key_data_t* this_key;
+
+    if (kb_buffer_peek(0, &this_key)) {
+        result = -1;
+    } else {
+        if (this_key->modifiers & GNW_KB_MOD_CAPS) {
+            switch (this_key->scan_code) {
+                case GNW_KB_SCAN_Q:
+                case GNW_KB_SCAN_W:
+                case GNW_KB_SCAN_E:
+                case GNW_KB_SCAN_R:
+                case GNW_KB_SCAN_T:
+                case GNW_KB_SCAN_Y:
+                case GNW_KB_SCAN_U:
+                case GNW_KB_SCAN_I:
+                case GNW_KB_SCAN_O:
+                case GNW_KB_SCAN_P:
+                case GNW_KB_SCAN_A:
+                case GNW_KB_SCAN_S:
+                case GNW_KB_SCAN_D:
+                case GNW_KB_SCAN_F:
+                case GNW_KB_SCAN_G:
+                case GNW_KB_SCAN_H:
+                case GNW_KB_SCAN_J:
+                case GNW_KB_SCAN_K:
+                case GNW_KB_SCAN_L:
+                case GNW_KB_SCAN_Z:
+                case GNW_KB_SCAN_X:
+                case GNW_KB_SCAN_C:
+                case GNW_KB_SCAN_V:
+                case GNW_KB_SCAN_B:
+                case GNW_KB_SCAN_N:
+                case GNW_KB_SCAN_M:
+                case GNW_KB_SCAN_SEMICOLON: /* FR M */
+                    if (this_key->modifiers & GNW_KB_MOD_SHIFT) {
+                        this_key->modifiers &= ~GNW_KB_MOD_SHIFT;
+                    } else {
+                        this_key->modifiers |= GNW_KB_MOD_LSHIFT;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        result = kb_next_ascii();
+    }
+
+    return result;
+}
 
 int32_t kb_next_ascii_German(void) { return -1; }
 
@@ -504,7 +555,109 @@ void kb_map_ascii_English_US(void) {
     GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_DELETE_REL, 339, 339, 419, 419, 403);
 }
 
-void kb_map_ascii_French(void) {}
+void kb_map_ascii_French(void) {
+    memset(ascii_table, -1, 256 * sizeof(key_ansi_t));
+
+    /* scan code, key stroke, shift, left_alt, right_alt, ctrl */
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_ESCAPE, 27, 27, 27, 27, 27);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_1, '&', '1', -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_2, 130, '2', -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_3, '"', '3', -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_4, '\'', '4', -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_5, '(', '5', -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_6, '-', '6', -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_7, 138, '7', -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_8, '_', '8', -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_9, 135, '9', -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_0, 133, '0', -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_MINUS, ')', 248, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_EQUALS, '=', '+', -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_BACKSPACE, 8, 8, 8, 8, 127);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_TAB, 9, 9, 9, 9, 9);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_Q, 'a', 'A', -1, -1, 1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_W, 'z', 'Z', -1, -1, 26);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_E, 'e', 'E', -1, -1, 5);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_R, 'r', 'R', -1, -1, 18);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_T, 't', 'T', -1, -1, 20);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_Y, 'y', 'Y', -1, -1, 25);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_U, 'u', 'U', -1, -1, 21);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_I, 'i', 'I', -1, -1, 9);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_O, 'o', 'O', -1, -1, 15);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_P, 'p', 'P', -1, -1, 16);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_LEFTBRACKET, 91, 123, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_RIGHTBRACKET, 93, 125, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_RETURN, 13, 13, 13, 13, 10);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_LCTRL, -1, -1, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_A, 'q', 'Q', -1, -1, 17);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_S, 's', 'S', -1, -1, 19);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_D, 'd', 'D', -1, -1, 4);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_F, 'f', 'F', -1, -1, 6);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_G, 'g', 'G', -1, -1, 7);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_H, 'h', 'H', -1, -1, 8);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_J, 'j', 'J', -1, -1, 10);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_K, 'k', 'K', -1, -1, 11);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_L, 'l', 'L', -1, -1, 12);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_SEMICOLON, 'm', 'M', -1, -1, 13);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_APOSTROPHE, 39, 34, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_GRAVE, 96, 126, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_LSHIFT, -1, -1, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_BACKSLASH, 92, 124, -1, -1, 192);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_Z, 'w', 'W', -1, -1, 23);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_X, 'x', 'X', -1, -1, 24);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_C, 'c', 'C', -1, -1, 3);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_V, 'v', 'V', -1, -1, 22);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_B, 'b', 'B', -1, -1, 2);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_N, 'n', 'N', -1, -1, 14);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_M, ',', '?', -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_COMMA, ';', '.', -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_PERIOD, ':', '/', -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_DIVIDE, '!', 167, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_RSHIFT, -1, -1, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_KP_MULTIPLY, 42, 42, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_LALT, -1, -1, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_SPACE, 32, 32, 32, 32, 32);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_CAPSLOCK, -1, -1, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_F1, 315, 340, 360, 360, 350);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_F2, 316, 341, 361, 361, 351);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_F3, 317, 342, 362, 362, 352);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_F4, 318, 343, 363, 363, 353);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_F5, 319, 344, 364, 364, 354);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_F6, 320, 345, 365, 365, 355);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_F7, 321, 346, 366, 366, 356);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_F8, 322, 347, 367, 367, 357);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_F9, 323, 348, 368, 368, 358);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_F10, 324, 349, 369, 369, 359);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_NUMLOCK, -1, -1, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_HOME, 327, 55, 407, 407, 375);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_UP, 328, 56, 408, 408, 397);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_PAGEUP, 329, 57, 409, 409, 388);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_KP_MINUS, 45, 45, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_LEFT, 331, 52, 411, 411, 371);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_KP_5, 332, 53, 9999, 9999, 399);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_RIGHT, 333, 54, 413, 413, 372);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_KP_PLUS, 43, 43, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_END, 335, 49, 415, 415, 373);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_DOWN, 336, 50, 416, 416, 401);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_PAGEDOWN, 337, 51, 417, 417, 374);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_INSERT, 338, 48, 418, 418, 402);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_DELETE, 339, 46, -1, 419, 403);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_F11, 389, 391, 395, 395, 393);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_F12, 390, 392, 396, 396, 394);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_KP_ENTER, 13, 13, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_RCTRL, -1, -1, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_KP_DIVIDE, 47, 47, -1, -1, 3);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_RALT, -1, -1, -1, -1, -1);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_HOME_REL, 327, 327, 407, 407, 375);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_UP_REL, 328, 328, 408, 408, 397);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_PAGEUP_REL, 329, 329, 409, 409, 388);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_LEFT_REL, 331, 331, 411, 411, 371);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_RIGHT_REL, 333, 333, 413, 413, 372);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_END_REL, 335, 335, 415, 415, 373);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_DOWN_REL, 336, 336, 416, 416, 401);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_PAGEDOWN_REL, 337, 337, 417, 417, 374);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_INSERT_REL, 338, 338, 418, 418, 402);
+    GNW_KB_KEY_MAP_ITEM(GNW_KB_SCAN_DELETE_REL, 339, 339, 419, 419, 403);
+}
 
 void kb_map_ascii_German(void) {}
 

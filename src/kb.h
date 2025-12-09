@@ -27,6 +27,10 @@
 #include "kb_code.h"
 #include "timer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum kb_layout_e { english, french, german, italian, spanish, unsupported_language } kb_layout_t;
 
 extern char keys[256];
@@ -43,5 +47,9 @@ void kb_set_layout(kb_layout_t layout);
 kb_layout_t kb_get_layout(void);
 int32_t kb_ascii_to_scan(int32_t ascii);
 void kb_simulate_key(uint16_t scan_code);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* KB_H */
