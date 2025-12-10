@@ -201,7 +201,8 @@ void SaveLoadMenu_Init(SaveSlot *slots, int32_t num_buttons, Button *buttons[], 
 
         } else {
             slots[i].in_use = false;
-            slots[i].file_name[0] = '\0';
+            snprintf(slots[i].file_name, sizeof(slots[i].file_name), "save%d.%s", first_slot_on_page + i,
+                     SaveLoadMenu_SaveFileTypes[save_file_type]);
             slots[i].save_name[0] = '\0';
             slots[i].game_file_type = save_game_type;
         }

@@ -234,12 +234,12 @@ void SaveLoad_Save(const std::filesystem::path &filepath, const char *const save
     if (file.Open(filepath.string().c_str())) {
         uint16_t version;
         uint8_t save_game_type;
-        char local_save_name[30];
+        char local_save_name[30] = {0};
         uint8_t world;
         uint16_t mission_index;
-        char team_names[4][30];
-        uint8_t team_type[5];
-        uint8_t team_clan[5];
+        char team_names[4][30] = {{0}};
+        uint8_t team_type[5] = {0};
+        uint8_t team_clan[5] = {0};
         int8_t opponent;
         uint16_t turn_timer_time;
         uint16_t endturn_time;
