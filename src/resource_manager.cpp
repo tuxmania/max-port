@@ -2161,3 +2161,5 @@ void ResourceManager_InitMissionRegistry() {
 
     ResourceManager_MissionRegistry = std::move(registry);
 }
+
+MissionRegistry* ResourceManager_GetMissionManager() { return ResourceManager_MissionRegistry.get(); }

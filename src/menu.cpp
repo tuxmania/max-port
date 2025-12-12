@@ -35,11 +35,14 @@
 #include "gfx.hpp"
 #include "inifile.hpp"
 #include "localization.hpp"
+#include "message_manager.hpp"
+#include "missionregistry.hpp"
 #include "movie.hpp"
 #include "okcancelmenu.hpp"
 #include "optionsmenu.hpp"
 #include "planetselectmenu.hpp"
 #include "remote.hpp"
+#include "resource_manager.hpp"
 #include "saveloadmenu.hpp"
 #include "smartstring.hpp"
 #include "sound_manager.hpp"
@@ -1974,7 +1977,28 @@ int32_t GameSetupMenu_Menu(int32_t game_file_type, bool flag1, bool flag2) {
     game_setup_menu.game_file_type = game_file_type;
 
     if (game_file_type == GAME_TYPE_CAMPAIGN) {
-        ini_set_setting(INI_GAME_FILE_NUMBER, ini_get_setting(INI_LAST_CAMPAIGN));
+        int32_t mission_count =
+            ResourceManager_GetMissionManager()->GetMissions(MISSION_CATEGORY_CAMPAIGN).size();
+
+        if (mission_count == 0) {
+            mission_count = 9;
+        }
+
+        int32_t last_campaign = ini_get_setting(INI_LAST_CAMPAIGN);
+
+        if (last_campaign == 0) {
+            last_campaign = 1;
+            ini_set_setting(INI_LAST_CAMPAIGN, 1);
+        }
+
+        if (last_campaign > mission_count) {
+            ini_set_setting(INI_LAST_CAMPAIGN, mission_count);
+            ini_config.Save();
+
+            last_campaign = mission_count;
+        }
+
+        ini_set_setting(INI_GAME_FILE_NUMBER, last_campaign);
     } else {
         ini_set_setting(INI_GAME_FILE_NUMBER, 1);
     }
@@ -2552,6 +2576,10 @@ void main_menu() {
 
                         if (game_file_number) {
                             ini_set_setting(INI_GAME_FILE_NUMBER, game_file_number);
+
+                            if (ini_get_setting(INI_LAST_CAMPAIGN) < game_file_number) {
+                                ini_set_setting(INI_LAST_CAMPAIGN, game_file_number);
+                            }
 
                             GameManager_GameLoop(GAME_STATE_10);
 

@@ -25,6 +25,9 @@
 #include <cstdio>
 #include <filesystem>
 #include <string>
+#include <vector>
+
+class MissionRegistry;
 
 #include "enums.hpp"
 #include "gnw.h"
@@ -137,5 +140,6 @@ void ResourceManager_InitHeatMaps(uint16_t team);
 void ResourceManager_InitTeamInfo();
 uint8_t *ResourceManager_GetBuffer(ResourceID id);
 std::string ResourceManager_Sha256(const ResourceID world);
+MissionRegistry* ResourceManager_GetMissionManager();
 
 #endif /* RESOURCE_MANAGER_HPP */

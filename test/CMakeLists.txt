@@ -39,6 +39,7 @@ add_executable(
     test_save_rocket.cpp
     test_keyboard_layout.cpp
     test_save_regression.cpp
+    test_mission_counts.cpp
     smartpointer.cpp
     smartlist.cpp
     smartarray.cpp

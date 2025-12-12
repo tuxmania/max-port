@@ -324,6 +324,19 @@ void GameSetupMenu::DrawMissionList() {
 
             process_bk();
 
+        } else if (game_file_type == GAME_TYPE_CAMPAIGN && (game_index_first_on_page + i) >= 1 &&
+                   (game_index_first_on_page + i) <= 9) {
+            ++game_count;
+
+            menu_setup_menu_mission_titles[i] = new (std::nothrow) char[30];
+            SDL_utf8strlcpy(menu_setup_menu_mission_titles[i],
+                            SaveLoadMenu_CampaignTitles[game_index_first_on_page + i - 1], 30);
+
+            DrawSaveFileTitle(i, COLOR_GREEN);
+            buttons[i]->Enable();
+
+            process_bk();
+
         } else {
             buttons[i]->Disable();
         }
