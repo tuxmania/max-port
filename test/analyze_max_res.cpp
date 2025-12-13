@@ -71,8 +71,14 @@ std::string trim(const std::string& str) {
     return str.substr(first, (last - first + 1));
 }
 
-// Function to find settings.ini and extract game_data path
-std::filesystem::path resolve_game_data_path() {
+// Function to find settings.ini and extract settings
+struct GameSettings {
+    std::filesystem::path game_data;
+    std::string language = "english";
+};
+
+GameSettings load_game_settings() {
+    GameSettings settings;
     std::vector<std::filesystem::path> setting_paths;
 
     // 1. Check XDG_DATA_HOME/max-port/settings.ini
@@ -89,15 +95,15 @@ std::filesystem::path resolve_game_data_path() {
     // 2. Fallback to local paths
     setting_paths.push_back("assets/settings.ini");
     setting_paths.push_back("settings.ini");
-    // Also check parent dir (common in build/test envs)
     setting_paths.push_back("../assets/settings.ini");
 
     for (const auto& path : setting_paths) {
         if (std::filesystem::exists(path)) {
-            // Found settings.ini, parse it
             std::ifstream ini_file(path);
             std::string line;
             bool in_setup = false;
+            bool found_file = true; // We found the file, so we use its values (or defaults)
+
             while (std::getline(ini_file, line)) {
                 line = trim(line);
                 if (line.empty() || line[0] == ';' || line[0] == '#') continue;
@@ -111,26 +117,25 @@ std::filesystem::path resolve_game_data_path() {
                     size_t eq_pos = line.find('=');
                     if (eq_pos != std::string::npos) {
                         std::string key = trim(line.substr(0, eq_pos));
+                        std::string value = trim(line.substr(eq_pos + 1));
+                        
                         if (key == "game_data") {
-                            std::string value = trim(line.substr(eq_pos + 1));
-                            // Handle "." relative path
                             if (value == ".") {
-                                // If ".", it means the executable dir or current dir? 
-                                // Usually means where the binary is, OR where settings.ini is?
-                                // Let's assume where settings.ini is, or fallback to current.
-                                // But for safety in this tool, let's treat it as the parent of settings.ini if absolute,
-                                // or just current dir.
-                                return std::filesystem::current_path();
+                                settings.game_data = std::filesystem::current_path();
+                            } else {
+                                settings.game_data = std::filesystem::path(value);
                             }
-                            return std::filesystem::path(value);
+                        } else if (key == "language") {
+                            settings.language = value;
                         }
                     }
                 }
             }
+            if (found_file) return settings;
         }
     }
     
-    return "";
+    return settings;
 }
 
 // Sanitize string for filename
@@ -180,7 +185,7 @@ void dump_hex(std::ostream& out, const std::vector<uint8_t>& data) {
 int main(int argc, char** argv) {
     std::filesystem::path max_res_path;
     bool dump_mode = false;
-    std::filesystem::path output_dir = "doc/specs";
+    GameSettings settings = load_game_settings();
 
     // Simple arg parsing
     for (int i = 1; i < argc; ++i) {
@@ -193,20 +198,10 @@ int main(int argc, char** argv) {
     }
 
     if (max_res_path.empty()) {
-       // Logic to find automatically...
-       // Reuse existing logic but need to refactor main slightly to accommodate arg parsing above
-       // For now, let's keep the existing auto-discovery if path is empty after loop
-    }
-    
-    // ... [Previous auto-discovery logic here, simplified/merged] ...
-    // To minimize code churn, I will adapt the variable `max_res_path`.
-    
-    if (max_res_path.empty()) {
-         std::filesystem::path game_data = resolve_game_data_path();
-         if (!game_data.empty()) {
+         if (!settings.game_data.empty()) {
             std::vector<std::filesystem::path> candidates = {
-                game_data / "MAX.RES",
-                game_data / "assets/MAX.RES"
+                settings.game_data / "MAX.RES",
+                settings.game_data / "assets/MAX.RES"
             };
             for (const auto& candidate : candidates) {
                 if (std::filesystem::exists(candidate)) {
@@ -252,7 +247,7 @@ int main(int argc, char** argv) {
 
     int item_count = header.size / sizeof(res_index);
 
-    std::filesystem::path specs_dir = "doc/specs";
+    std::filesystem::path specs_dir = std::filesystem::path("doc/specs") / settings.language;
     std::filesystem::path structure_dir = specs_dir / "RES_Structure";
     std::filesystem::path dump_dir = specs_dir / "RES_Dump";
     std::filesystem::path txt_dir = specs_dir / "RES_TXT";

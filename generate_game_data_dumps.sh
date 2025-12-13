@@ -16,6 +16,12 @@
 # Ensure the script generates the output in the correct directory regardless of pwd
 cd "$(dirname "$0")"
 
+echo "WARNING: To ensure correct language settings are used, please make sure you have"
+echo "         launched the game at least once to generate the user settings file"
+echo "         (e.g., ~/.local/share/max-port/settings.ini)."
+echo "         Otherwise, default settings (English) may be used."
+echo ""
+
 # 1. Build the analysis tool to ensure it's up-to-date
 echo "Building analyze_max_res tool..."
 if [ ! -d "RelWithDebInfo" ]; then
