@@ -60,3 +60,9 @@ MinSizeRel/**
 
 # Fichiers de configuration de l'éditeur VS Code
 .vscode/
+
+# Copyrighted generated content
+doc/specs/RES_Dump/
+doc/specs/RES_TXT/
+doc/specs/RES_Structure/
+

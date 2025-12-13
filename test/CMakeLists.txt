@@ -83,3 +83,9 @@ gtest_discover_tests(max_tests PROPERTIES
 	LABELS "unit tests"
 	DISCOVERY_TIMEOUT 240
 )
+
+# Tool to analyze MAX.RES
+add_executable(analyze_max_res analyze_max_res.cpp)
+target_include_directories(analyze_max_res PRIVATE ../src)
+target_link_options(analyze_max_res PRIVATE -static -static-libgcc -static-libstdc++)
+
